@@ -40,6 +40,7 @@ function renderTaskList() {
                                     <option value="done" ${task.state === 'done' ? 'selected' : ''}>Done</option>
                                 </select>
                                 <p>Due Date: ${dayjs(task.dueDate).format('MM/DD/YY')}</p>
+                                <button class="btn deleteButton">Delete</button>
                             </div>`);
     //Add a color classes:
     //Overdue tasks: red, Due Today: Yellow, Done Tasks: green
@@ -56,8 +57,12 @@ function renderTaskList() {
         $inProgressList.append(taskElement);
     } else if (task.state === 'done') {
         $doneList.append(taskElement);
-        taskElement.removeClass('overdue');
         taskElement.addClass('done');
+        //remove any other classes  
+        taskElement.removeClass('overdue');
+        taskElement.removeClass('dueToday');
+        //Add a smiley.  Hooray!
+        taskElement.append('<span>&#128512;</span>');
     }
     });
     
@@ -125,20 +130,33 @@ function handleAddTask(event){
 
 // Todo: create a function to handle deleting a task
 function handleDeleteTask(event){
-
+taskList.splice(event, 1);
+console.log(event);
+console.log("Task deleted");
+renderTaskList();
 }
+//create a function to handle changing a task's status
+function statusChange(event){
 
+};
 // Todo: create a function to handle dropping a task into a new status lane
 function handleDrop(event, ui) {
 
+    const cardId = $(event.target).closest('.card').attr('id').split('-')[1];
+    const newStatus = $(event.target).val();
 }
 
 // Todo: when the page loads, render the task list, add event listeners, make lanes droppable, and make the due date field a date picker
 $(document).ready(function () {
     //call the functions to render the task list, add event listeners, make lanes droppable,
     renderTaskList();
-    $(".task-lane").droppable({
-        drop: handleDrop
+    $('.lane').droppable({
+        accept: '.card',
+        drop: function(event, ui) {
+            const droppedCard = ui.helper.clone();
+            $(this).find('.card-body').append(droppedCard);
+            ui.helper.remove();
+        }
     });
 });
 
@@ -186,6 +204,7 @@ $("#clearLocalStorage").click(function() {
 //Event listener to change the task status when a dropdown is selected
 $(document).on('change', ".stateDropdown", function() {
     console.log($(this).val());
+    //find the task id associated with the dropdown and update the task status in the taskList array
     const taskId = $(this).closest('.taskCard').attr('id').split('-')[1];
     const selectedState = $(this).val();
     taskList.forEach(task => {
@@ -195,4 +214,11 @@ $(document).on('change', ".stateDropdown", function() {
     });
     localStorage.setItem("tasks", JSON.stringify(taskList));
     renderTaskList();
+});
+
+//Event listener to delete a task when a delete button is clicked
+
+$(document).on('click', ".deleteButton", function() {
+    const taskId = $(this).closest('.taskCard').attr('id').split('-')[1];
+    handleDeleteTask(taskId);
 });

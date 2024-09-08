@@ -10,7 +10,7 @@
     integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous" />
   <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
-
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.6/dayjs.min.js"></script>
   <link rel="stylesheet" href="./assets/css/style.css" />
   
   <title>Task Board</title>
@@ -19,6 +19,7 @@
 <body>
   <header class="p-4 mb-4 text-center border-bottom border-5">
     <h1 class="display-3">Task Board</h1>
+    <button id="clearLocalStorage">Clear Storage</button>
     <p class="lead">A simple Kanban board for task management</p>
   </header>
   <div class="container">
@@ -26,15 +27,17 @@
       <button class="btn btn-success" id ="openModal"data-bs-toggle="modal" data-bs-target="#formModal">Add Task</button>
     </div>
     <!-- Todo: Create a modal with a form to add tasks -->
-    <div id="myModal" class="modal">
+    <div id="addTaskModal" class="modal">
       
       <div class="modal-content">
         
         <span class="close">&times;</span>
-        <label for="input1">Input 1:</label><br>
+        <label for="input1">Task Name:</label><br>
         <input type="text" id="input1"><br><br>
-        <label for="input2">Input 2:</label><br>
+        <div id="input1Error" class="error-message"></div>
+        <label for="input2">Task Description:</label><br>
         <input type="text" id="input2"><br><br>
+        <div id="input2Error" class="error-message"></div>
         <div id="calendarModal" style="display: none;">
           <div class="modal-content">
             <div class="modal-header">
@@ -43,12 +46,15 @@
             </div>
             <div class="modal-body">
               <input type="text" id="datepicker">
+              
             </div>
           </div>
         </div>
+        <div id="datepickerError" class="error-message"></div>
         <button id="openCalendar">Due Date</button>
-        <button id="submitBtn">Submit</button>
+        
         <div id="due-date"></div>
+        <button id="submitBtn">Submit</button>
       </div>
       
     </div>

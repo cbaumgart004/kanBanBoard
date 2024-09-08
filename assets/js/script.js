@@ -2,7 +2,7 @@
 let taskList = JSON.parse(localStorage.getItem("tasks"))||[];
 let nextId = JSON.parse(localStorage.getItem("nextId"));
 
-const modal = document.getElementById("myModal");
+const modal = document.getElementById("addTaskModal");
 const btn = document.getElementById("openModal");
 const span = document.getElementsByClassName("close")[0];
 
@@ -54,15 +54,41 @@ function renderTaskList() {
                                 <p>Id: ${task.id}</p>
                                 <h3>${task.name}</h3>
                                 <p>${task.description}</p>
-                                
+                                <p>Due Date: ${dayjs(task.dueDate).format('MM/DD/YY')}</p>
                             </div>`);
         $toDoList.append(taskElement);
     });
     
 }
+function formValidation(event) {
+    if (!$('#input1').val()) {
+        $('#input1Error').text('Please fill out task title');
+    } else {
+        $('#input1Error').text('');
+    }
 
+    if (!$('#input2').val()) {
+        $('#input2Error').text('Please fill out task description');
+    } else {
+        $('#input2Error').text('');
+    }
+
+    if (!$('#datepicker').val()) {
+        $('#datepickerError').text('Please select a date');
+    } else {
+        $('#datepickerError').text('');
+    }
+
+    if ($('#input1').val() && $('#input2').val() && $('#datepicker').val()) {
+        console.log('Form submitted');
+        handleAddTask(event);
+    }
+};
 // Todo: create a function to handle adding a new task
 function handleAddTask(event){
+    
+        
+    
     // Prevent form submission
     event.preventDefault();
     // Get the input values
@@ -81,15 +107,18 @@ function handleAddTask(event){
     taskList.push(newTask);
     // Save the updated task list to localStorage
     localStorage.setItem("tasks", JSON.stringify(taskList));
+    localStorage.setItem("nextId", nextId);
     // Clear the input fields
     $("#input1").val("");
     $("#input2").val("");
+    $("#datepicker").val("");
     // Render the updated task list
     renderTaskList();
     // Hide the modals
-    $('#addTaskModal').modal('hide');
+    modal.style.display = "none";
     console.log(newTask);
-}
+
+};
 
 // Todo: create a function to handle deleting a task
 function handleDeleteTask(event){
@@ -111,7 +140,15 @@ $(document).ready(function () {
 });
 
 //Create a modal when the "Add Task" button is clicked
-  
-    // When the form is submitted, call the handleAddTask function
-$('#submitBtn').click(handleAddTask);
 
+// When the form is submitted, call the handleAddTask function after validation
+    $('#submitBtn').click(formValidation);
+        
+    
+//Clear Storage when the "Clear Storage" button is clicked
+$("#clearLocalStorage").click(function() {
+    localStorage.clear();
+    nextId = "";
+    taskList = [];
+    renderTaskList();
+});

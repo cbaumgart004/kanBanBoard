@@ -23,11 +23,25 @@ modal.style.display = "none";
     submitBtn.onclick = function() {
     const input1Value = document.getElementById("input1").value;
     const input2Value = document.getElementById("input2").value;
+    const datepickerValue = $("#datepicker").datepicker("getDate"); // Get the selected date value
     // Do something with the input values, e.g., send them to a server
     console.log("Input 1:", input1Value);
     console.log("Input 2:", input2Value);
+    console.log("Datepicker Value:", datepickerValue);
     modal.style.display = "none";
 };
+$(document).ready(function() {
+    $("#openCalendar").click(function() {
+      $("#calendarModal").show();
+    });
+
+    $(".close").click(function() {
+      $("#calendarModal").hide();
+    });
+
+    $("#datepicker").datepicker();
+  });
+
 // TODO: create a function to generate a unique task id
 function generateTaskId() {
     return nextId++;

@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
 
   <link rel="stylesheet" href="./assets/css/style.css" />
+  
   <title>Task Board</title>
 </head>
 
@@ -22,9 +23,19 @@
   </header>
   <div class="container">
     <div class="text-center mb-5">
-      <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#formModal">Add Task</button>
+      <button class="btn btn-success" id ="openModal"data-bs-toggle="modal" data-bs-target="#formModal">Add Task</button>
     </div>
     <!-- Todo: Create a modal with a form to add tasks -->
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <label for="input1">Input 1:</label><br>
+        <input type="text" id="input1"><br><br>
+        <label for="input2">Input 2:</label><br>
+        <input type="text" id="input2"><br><br>
+        <button id="submitBtn">Submit</button>
+      </div>
+    </div>
     <div class="row swim-lanes text-center justify-content-between">
       <div class="col-12 col-lg-4 d-flex">
         <div id="to-do" class="card border-light mb-3 lane flex-grow-1">

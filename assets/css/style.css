@@ -11,11 +11,15 @@ body {
   min-height: 60vh;
 }
 
-.task-card {
+.taskCard {
   margin: 0 auto;
+  border: 1px, solid, gray;
+  border-radius: 20px; 
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
-.task-card:hover {
+.taskCard:hover {
   cursor: grab;
 }
 /* Modal styles */

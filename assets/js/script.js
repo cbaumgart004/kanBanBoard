@@ -6,32 +6,7 @@ const modal = document.getElementById("addTaskModal");
 const btn = document.getElementById("openModal");
 const span = document.getElementsByClassName("close")[0];
 
-btn.onclick = function() {
-    modal.style.display = "block";
-};
 
-span.onclick = function() {
-    modal.style.display = "none";
-};
-
- window.onclick = function(event) {
-    if (event.target == modal) {
-modal.style.display = "none";
-    }
-};
-
-    
-$(document).ready(function() {
-    $("#openCalendar").click(function() {
-      $("#calendarModal").show();
-    });
-
-    $(".close").click(function() {
-      $("#calendarModal").hide();
-    });
-
-    $("#datepicker").datepicker();
-  });
 
 // TODO: create a function to generate a unique task id
 function generateTaskId() {
@@ -45,21 +20,38 @@ function createTaskCard(task) {
 
 // Todo: create a function to render the task list and make cards draggable
 function renderTaskList() {
+
     //loop through the task list and create a task card for each task
     const $toDoList = $('#todo-cards');
-    $toDoList.empty(); // Clear existing tasks before rendering
-
+    const $inProgressList = $('#in-progress-cards');
+    const $doneList = $('#done-cards');
+    $toDoList.empty(); // Clear all swim lanes
+    $inProgressList.empty();
+    $doneList.empty();
+    
     taskList.forEach(task => {
-        const taskElement = $(`<div class="task" id="task-${task.id}">
+        const taskElement = $(`<div class="taskCard" id="task-${task.id}">
                                 <p>Id: ${task.id}</p>
                                 <h3>${task.name}</h3>
                                 <p>${task.description}</p>
+                                <select id = "state${task.id}"class="stateDropdown">
+                                    <option value="toDo" ${task.state === 'toDo' ? 'selected' : ''}>To Do</option>
+                                    <option value="inProgress" ${task.state === 'inProgress' ? 'selected' : ''}>In Progress</option>
+                                    <option value="done" ${task.state === 'done' ? 'selected' : ''}>Done</option>
+                                </select>
                                 <p>Due Date: ${dayjs(task.dueDate).format('MM/DD/YY')}</p>
                             </div>`);
+    if (task.state === 'toDo') {
         $toDoList.append(taskElement);
+    } else if (task.state === 'inProgress') {
+        $inProgressList.append(taskElement);
+    } else if (task.state === 'done') {
+        $doneList.append(taskElement);
+    }
     });
     
 }
+//Check if all fields are filled out before submitting the form
 function formValidation(event) {
     if (!$('#input1').val()) {
         $('#input1Error').text('Please fill out task title');
@@ -81,13 +73,12 @@ function formValidation(event) {
 
     if ($('#input1').val() && $('#input2').val() && $('#datepicker').val()) {
         console.log('Form submitted');
+        //if the form is complete, call the addTask function
         handleAddTask(event);
     }
 };
-// Todo: create a function to handle adding a new task
+//  create a function to handle adding a new task
 function handleAddTask(event){
-    
-        
     
     // Prevent form submission
     event.preventDefault();
@@ -99,6 +90,7 @@ function handleAddTask(event){
     const newTask = {
         id: generateTaskId(),
         name: input1Value,
+        //by default, tasks are in the "toDo" status
         state: "toDo",
         description: input2Value,
         dueDate: datepickerValue
@@ -140,8 +132,35 @@ $(document).ready(function () {
 });
 
 //Create a modal when the "Add Task" button is clicked
+//Event Listeners:
+//Add Task and Datepicker:
+btn.onclick = function() {
+    modal.style.display = "block";
+};
 
-// When the form is submitted, call the handleAddTask function after validation
+span.onclick = function() {
+    modal.style.display = "none";
+};
+
+ window.onclick = function(event) {
+    if (event.target == modal) {
+modal.style.display = "none";
+    }
+};
+
+    
+$(document).ready(function() {
+    $("#datepicker").click(function() {
+      $("#calendarModal").show();
+    });
+
+    $(".close").click(function() {
+      $("#calendarModal").hide();
+    });
+
+    $("#datepicker").datepicker();
+  });
+// When the form is submitted, call the for form validation function
     $('#submitBtn').click(formValidation);
         
     
@@ -150,5 +169,19 @@ $("#clearLocalStorage").click(function() {
     localStorage.clear();
     nextId = "";
     taskList = [];
+    renderTaskList();
+});
+
+//Event listener to change the task status when a dropdown is selected
+$(document).on('change', ".stateDropdown", function() {
+    console.log($(this).val());
+    const taskId = $(this).closest('.taskCard').attr('id').split('-')[1];
+    const selectedState = $(this).val();
+    taskList.forEach(task => {
+        if (task.id === parseInt(taskId)) {
+            task.state = selectedState;
+        }
+    });
+    localStorage.setItem("tasks", JSON.stringify(taskList));
     renderTaskList();
 });

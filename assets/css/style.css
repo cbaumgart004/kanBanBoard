@@ -22,6 +22,21 @@ body {
 .taskCard:hover {
   cursor: grab;
 }
+
+.overdue {
+  background-color: rgb(131, 14, 14);
+  color: white;
+}
+
+.done {
+  background-color: rgb(76, 181, 76);
+  color: white;
+}
+
+.dueToday {
+  background-color: rgb(255, 165, 0);
+  color: white;
+}
 /* Modal styles */
 .modal {
   display: none;

@@ -28,7 +28,7 @@ function renderTaskList() {
     $toDoList.empty(); // Clear all swim lanes
     $inProgressList.empty();
     $doneList.empty();
-    
+
     taskList.forEach(task => {
         const taskElement = $(`<div class="taskCard" id="task-${task.id}">
                                 <p>Id: ${task.id}</p>
@@ -41,12 +41,23 @@ function renderTaskList() {
                                 </select>
                                 <p>Due Date: ${dayjs(task.dueDate).format('MM/DD/YY')}</p>
                             </div>`);
+    //Add a color classes:
+    //Overdue tasks: red, Due Today: Yellow, Done Tasks: green
+    const taskDueDate = dayjs(task.dueDate);
+    const today = dayjs();
+    if(taskDueDate.isBefore(today, 'day')) { 
+        taskElement.addClass('overdue');
+    } else if(taskDueDate.isSame(today, 'day')) {
+        taskElement.addClass('dueToday');
+    };
     if (task.state === 'toDo') {
         $toDoList.append(taskElement);
     } else if (task.state === 'inProgress') {
         $inProgressList.append(taskElement);
     } else if (task.state === 'done') {
         $doneList.append(taskElement);
+        taskElement.removeClass('overdue');
+        taskElement.addClass('done');
     }
     });
     
@@ -151,15 +162,15 @@ modal.style.display = "none";
     
 $(document).ready(function() {
     $("#datepicker").click(function() {
-      $("#calendarModal").show();
+        $("#calendarModal").show();
     });
 
     $(".close").click(function() {
-      $("#calendarModal").hide();
+        $("#calendarModal").hide();
     });
 
     $("#datepicker").datepicker();
-  });
+});
 // When the form is submitted, call the for form validation function
     $('#submitBtn').click(formValidation);
         

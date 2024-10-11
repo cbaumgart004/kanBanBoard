@@ -32,6 +32,8 @@
     <header class="p-4 mb-4 text-center border-bottom border-5">
       <h1 class="display-3">Task Board</h1>
       <button id="clearLocalStorage">Clear Storage</button>
+      <button id="logTasks">Log All Tasks</button>
+      <button id="recoverStates">Recover States</button>
       <p class="lead">A simple Kanban board for task management</p>
     </header>
     <div class="container">
@@ -105,7 +107,7 @@
 
       <div class="row swim-lanes text-center justify-content-between">
         <div class="col-12 col-lg-4 d-flex">
-          <div id="to-do" class="card border-light mb-3 lane flex-grow-1">
+          <div id="toDo" class="card border-light mb-3 lane flex-grow-1">
             <div class="card-header bg-white">
               <h2 class="card-title mb-1">To Do</h2>
             </div>
@@ -115,7 +117,7 @@
           </div>
         </div>
         <div class="col-12 col-lg-4 d-flex">
-          <div id="in-progress" class="card border-light mb-3 lane flex-grow-1">
+          <div id="inProgress" class="card border-light mb-3 lane flex-grow-1">
             <div class="card-header bg-white">
               <h2 class="card-title mb-1">In Progress</h2>
             </div>

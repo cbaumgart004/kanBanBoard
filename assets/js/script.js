@@ -1,6 +1,6 @@
 // Retrieve tasks and nextId from localStorage
 let taskList = JSON.parse(localStorage.getItem('tasks')) || []
-let nextId = JSON.parse(localStorage.getItem('nextId'))
+let nextId = JSON.parse(localStorage.getItem('nextId')) || 0
 
 const modal = document.getElementById('addTaskModal')
 const btn = document.getElementById('openModal')
@@ -14,7 +14,7 @@ function generateTaskId() {
 
 // Todo: create a function to render the task list and make cards draggable
 function renderTaskList() {
-  //loop through the task list and create a task card for each task
+  // Loop through the task list and create a task card for each task
   const $toDoList = $('#todo-cards')
   const $inProgressList = $('#in-progress-cards')
   const $doneList = $('#done-cards')
@@ -23,13 +23,14 @@ function renderTaskList() {
   $doneList.empty()
 
   taskList.forEach((task) => {
-    const taskElement = $(`<div class="taskCard" id="task-${task.id}">
+    const taskElement = $(
+      `<div class="taskCard" id="task-${task.id}" draggable="true">
                                 <p>Id: ${task.id}</p>
                                 <h3>${task.name}</h3>
                                 <p>${task.description}</p>
-                                <select id = "state${
+                                <select id="state${
                                   task.id
-                                }"class="stateDropdown">
+                                }" class="stateDropdown">
                                     <option value="toDo" ${
                                       task.state === 'toDo' ? 'selected' : ''
                                     }>To Do</option>
@@ -47,9 +48,10 @@ function renderTaskList() {
                                 )}</p>
                                 <button class="btn editButton">Edit</button>
                                 <button class="btn deleteButton">Delete</button>
-                            </div>`)
-    //Add color classes:
-    //Overdue tasks: red, Due Today: Yellow, Done Tasks: green
+                            </div>`
+    )
+    // Add color classes:
+    // Overdue tasks: red, Due Today: Yellow, Done Tasks: green
     const taskDueDate = dayjs(task.dueDate)
     const today = dayjs()
     if (taskDueDate.isBefore(today, 'day')) {
@@ -64,15 +66,27 @@ function renderTaskList() {
     } else if (task.state === 'done') {
       $doneList.append(taskElement)
       taskElement.addClass('done')
-      //remove any other classes
+      // Remove any other classes
       taskElement.removeClass('overdue')
       taskElement.removeClass('dueToday')
-      //Add a smiley.  Hooray!
+      // Add a smiley. Hooray!
       taskElement.append('<span>&#128512;</span>')
     }
+
+    // Make the task card draggable
+    taskElement.draggable({
+      revert: 'invalid', // If not dropped in a droppable, revert to original position
+      start: function (event, ui) {
+        $(this).addClass('dragging')
+      },
+      stop: function (event, ui) {
+        $(this).removeClass('dragging')
+      },
+    })
   })
 }
-//Check if all fields are filled out before submitting the form
+
+// Check if all fields are filled out before submitting the form
 function formValidation(event) {
   if (!$('#input1').val()) {
     $('#input1Error').text('Please fill out task title')
@@ -94,12 +108,13 @@ function formValidation(event) {
 
   if ($('#input1').val() && $('#input2').val() && $('#datepicker').val()) {
     console.log('Form submitted')
-    //if the form is complete, call the addTask function
+    // If the form is complete, call the addTask function
     $('#addTaskModal').hide()
     handleAddTask(event)
   }
 }
-//  create a function to handle adding a new task
+
+// Create a function to handle adding a new task
 function handleAddTask(event) {
   // Prevent form submission
   event.preventDefault()
@@ -111,7 +126,7 @@ function handleAddTask(event) {
   const newTask = {
     id: generateTaskId(),
     name: input1Value,
-    //by default, tasks are in the "toDo" status
+    // By default, tasks are in the "toDo" status
     state: 'toDo',
     description: input2Value,
     dueDate: datepickerValue,
@@ -128,73 +143,54 @@ function handleAddTask(event) {
   // Render the updated task list
   renderTaskList()
   // Hide the modals
-  //modal.style.display = "none";
   console.log(newTask)
 }
-function handleEditTask(taskId) {
-  // Retrieve the task from the task list
-  const task = taskList.find((task) => task.id == taskId)
 
-  console.log(task)
+// Function to handle dropping a task into a new status lane
+function handleDrop(event, ui) {
+  const cardId = $(ui.draggable).attr('id').split('-')[1]
+  const newStatus = $(event.target).attr('id').split('-')[0]
+  console.log('Dropped card', cardId, 'into', newStatus)
+  // Update the task's state in the taskList array
+  taskList.forEach((task) => {
+    if (task.id === parseInt(cardId)) {
+      task.state = newStatus
+    }
+  })
 
-  // Populate the edit modal input fields
-  $('#editInput1').val(task.name)
-  $('#editInput2').val(task.description)
-
-  // Set the date in the datepicker
-  $('#editDatepicker').datepicker('setDate', new Date(task.dueDate))
-}
-
-// Todo: create a function to handle deleting a task
-function handleDeleteTask(event) {
-  taskList.splice(event, 1)
-  console.log(event)
-  console.log('Task deleted')
-  for (let i = 0; i < taskList.length; i++) {
-    taskList[i].id = i
-  }
-  nextId = taskList.length
-  localStorage.setItem(nextId, nextId)
   // Save the updated task list to localStorage
   localStorage.setItem('tasks', JSON.stringify(taskList))
+
+  // Re-render the task list
   renderTaskList()
-}
-//create a function to handle changing a task's status
-function statusChange(event) {}
-// Todo: create a function to handle dropping a task into a new status lane
-function handleDrop(event, ui) {
-  const cardId = $(event.target).closest('.card').attr('id').split('-')[1]
-  const newStatus = $(event.target).val()
 }
 
 // Todo: when the page loads, render the task list, add event listeners, make lanes droppable, and make the due date field a date picker
 $(document).ready(function () {
-  //call the functions to render the task list, add event listeners, make lanes droppable,
+  // Call the functions to render the task list, add event listeners, make lanes droppable,
   renderTaskList()
+
   $('.lane').droppable({
-    accept: '.card',
-    drop: function (event, ui) {
-      const droppedCard = ui.helper.clone()
-      $(this).find('.card-body').append(droppedCard)
-      ui.helper.remove()
-    },
+    accept: '.taskCard',
+    drop: handleDrop,
+    hoverClass: 'hovered',
   })
 })
 
-//Create a modal when the "Add Task" button is clicked
-//Event Listeners:
-//Add Task and Datepicker:
+// Create a modal when the "Add Task" button is clicked
+// Event Listeners:
+// Add Task and Datepicker:
 $('#openModal').click(function () {
   $('#addTaskModal').show()
 })
 
 span.onclick = function () {
-  //modal.style.display = "none";
+  $('#addTaskModal').hide()
 }
 
 window.onclick = function (event) {
-  if (event.target == modal) {
-    //modal.style.display = "none";
+  if (event.target === modal) {
+    $('#addTaskModal').hide()
   }
 }
 
@@ -212,21 +208,36 @@ $(document).ready(function () {
 
   $('#datepicker').datepicker()
 })
-// When the form is submitted, call the for form validation function
+
+// When the form is submitted, call the form validation function
 $('#submitBtn').click(formValidation)
 
-//Clear Storage when the "Clear Storage" button is clicked
+// Clear Storage when the "Clear Storage" button is clicked
 $('#clearLocalStorage').click(function () {
   localStorage.clear()
-  nextId = ''
+  nextId = 0
   taskList = []
   renderTaskList()
 })
 
-//Event listener to change the task status when a dropdown is selected
+// Log all tasks when the "Log Tasks" button is clicked
+$('#logTasks').click(function () {
+  console.log('clicked Log Tasks')
+  console.log(taskList)
+})
+$('#recoverStates').click(function () {
+  console.log('clicked Recover States')
+  //set all states to 'toDo'
+  taskList.forEach((task) => {
+    task.state = 'toDo'
+  })
+  localStorage.setItem('tasks', JSON.stringify(taskList))
+  renderTaskList()
+})
+// Event listener to change the task status when a dropdown is selected
 $(document).on('change', '.stateDropdown', function () {
   console.log($(this).val())
-  //find the task id associated with the dropdown and update the task status in the taskList array
+  // Find the task id associated with the dropdown and update the task status in the taskList array
   taskId = $(this).closest('.taskCard').attr('id').split('-')[1]
   const selectedState = $(this).val()
   taskList.forEach((task) => {
@@ -237,21 +248,20 @@ $(document).on('change', '.stateDropdown', function () {
   localStorage.setItem('tasks', JSON.stringify(taskList))
   renderTaskList()
 })
-//Event Listener to edit a task when an edit button is clicked
 
+// Event Listener to edit a task when an edit button is clicked
 $(document).on('click', '.editButton', function () {
   taskId = $(this).closest('.taskCard').attr('id').split('-')[1]
   console.log(taskId)
-  //initialize the date picker with the current task due date
+  // Initialize the date picker with the current task due date
   $('#editDatepicker').datepicker()
   $('#editModal').show()
   handleEditTask(taskId)
 })
-//Event listener to delete a task when a delete button is clicked
 
+// Event listener to delete a task when a delete button is clicked
 $(document).on('click', '.deleteButton', function () {
   taskId = $(this).closest('.taskCard').attr('id').split('-')[1]
-
   $('#deleteModal').show()
 })
 
@@ -264,8 +274,7 @@ $('#cancelDelete').click(function () {
   $('#deleteModal').hide()
 })
 
-//Submit the edited task when the "Save Changes" button is clicked
-
+// Submit the edited task when the "Save Changes" button is clicked
 $('#editSubmitBtn').click(function () {
   $('#editModal').hide()
 
@@ -288,12 +297,4 @@ $('#editSubmitBtn').click(function () {
 
   // Re-render the task list
   renderTaskList()
-})
-
-card.addEventListener('click', () => {
-  alert('Card Clicked!')
-})
-
-document.addEventListener('mousemove', (event) => {
-  card.style.transform = `translate(${event.clientX}px, ${event.clientY}px)`
 })

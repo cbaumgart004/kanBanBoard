@@ -145,7 +145,30 @@ function handleAddTask(event) {
   // Hide the modals
   console.log(newTask)
 }
+function handleEditTask(taskId) {
+  // Find the task in the task list using the taskId
+  const taskToEdit = taskList.find((task) => task.id === parseInt(taskId))
 
+  if (taskToEdit) {
+    // Populate the edit modal fields with the task details
+    $('#editInput1').val(taskToEdit.name) // Set task name
+    $('#editInput2').val(taskToEdit.description) // Set task description
+    $('#editDatepicker').datepicker('setDate', new Date(taskToEdit.dueDate)) // Set due date in datepicker
+  }
+}
+function handleDeleteTask(taskId) {
+  // Find the task in the task list using the taskId
+  const taskToDelete = taskList.find((task) => task.id === parseInt(taskId))
+  if (taskToDelete) {
+    // Remove the task from the task list
+    taskList = taskList.filter((task) => task.id !== parseInt(taskId))
+  }
+  // Save the updated task list to localStorage
+  localStorage.setItem('tasks', JSON.stringify(taskList))
+  localStorage.setItem('nextId', nextId)
+  // Re-render the task list
+  renderTaskList()
+}
 // Function to handle dropping a task into a new status lane
 function handleDrop(event, ui) {
   const cardId = $(ui.draggable).attr('id').split('-')[1]
@@ -188,11 +211,15 @@ span.onclick = function () {
   $('#addTaskModal').hide()
 }
 
-window.onclick = function (event) {
-  if (event.target === modal) {
+// jQuery to hide the modal when clicking outside of it
+$(window).click(function (event) {
+  // Check if the clicked element is the modal
+  if ($(event.target).is('#editModal') || $(event.target).is('#addTaskModal')) {
+    // Hide the modal
+    $('#editModal').hide()
     $('#addTaskModal').hide()
   }
-}
+})
 
 $(document).ready(function () {
   $('#datepicker').click(function () {
@@ -203,6 +230,7 @@ $(document).ready(function () {
   })
   $('.close').click(function () {
     $('#calendarModal').hide()
+    $('#editModal').hide()
     console.log('Modal Closed')
   })
 

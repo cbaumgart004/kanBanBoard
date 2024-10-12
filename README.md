@@ -3,7 +3,6 @@
 ## Description
 
 This is a simple KanBan board format that allows users, using local storage, to add, edit, and delete tasks. Users can also organize tasks by categories "To Do", "In Progress", and "Done". Note that all tasks that are overdue will turn red to alert the user that this task needs to be accomplished. All tasks due today are coded yellow. All tasks that are done turn green and get a little extra smiley face. Users can update the status of a task either by adjusting the dropdown menu OR dragging the task into the corresponding swim lane.
-?
 
 ## Table of Contents (Optional)
 
